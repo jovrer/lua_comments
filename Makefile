@@ -12,7 +12,7 @@ CONFIG = -DPOPEN -D_POSIX_SOURCE
 # Compilation parameters
 CC = gcc
 CWARNS = -Wall -Wmissing-prototypes -Wshadow -pedantic -Wpointer-arith -Wcast-align -Waggregate-return
-CFLAGS = $(CONFIG) $(CWARNS) -ansi -O2 -fomit-frame-pointer
+CFLAGS = $(CONFIG) $(CWARNS) -ansi -O0 -ggdb3 -fomit-frame-pointer
 
 #CC = acc
 #CFLAGS = -fast -I/usr/5include
