@@ -1,7 +1,7 @@
 /*
 ** tree.h
 ** TecCGraf - PUC-Rio
-** $Id: tree.h,v 1.8 1994/12/20 21:20:36 roberto Exp roberto $
+** $Id: tree.h,v 1.13 1996/02/14 13:35:51 roberto Exp roberto $
 */
 
 #ifndef tree_h
@@ -14,24 +14,15 @@
 
 typedef struct TaggedString
 {
+  Word varindex;  /* != NOT_USED  if this is a symbol */
+  Word constindex;  /* != NOT_USED  if this is a constant */
   unsigned long hash;  /* 0 if not initialized */
-  char marked;   /* for garbage collection */
+  int marked;   /* for garbage collection; never collect (nor change) if > 1 */
   char str[1];   /* \0 byte already reserved */
 } TaggedString;
  
-typedef struct TreeNode
-{
- struct TreeNode *right;
- struct TreeNode *left;
- unsigned short varindex;  /* != NOT_USED  if this is a symbol */
- unsigned short constindex;  /* != NOT_USED  if this is a constant */
- TaggedString ts;
-} TreeNode;
-
 
 TaggedString *lua_createstring (char *str);
-TreeNode *lua_constcreate  (char *str);
 Long lua_strcollector (void);
-TreeNode *lua_varnext      (char *n);
 
 #endif

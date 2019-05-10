@@ -3,7 +3,7 @@
 ** Linguagem para Usuarios de Aplicacao
 */
 
-char *rcs_lua="$Id: lua.c,v 1.3 1994/12/14 19:58:20 celes Exp $";
+char *rcs_lua="$Id: lua.c,v 1.13 1996/07/06 20:20:35 roberto Exp roberto $";
 
 #include <stdio.h>
 #include <string.h>
@@ -11,64 +11,61 @@ char *rcs_lua="$Id: lua.c,v 1.3 1994/12/14 19:58:20 celes Exp $";
 #include "lua.h"
 #include "lualib.h"
 
-static int lua_argc;
-static char **lua_argv;
 
-/*
-%F Allow Lua code to access argv strings.
-%i Receive from Lua the argument number (starting with 1).
-%o Return to Lua the argument, or nil if it does not exist.
-*/
-static void lua_getargv (void)
+#ifdef _POSIX_SOURCE
+#include <unistd.h>
+#else
+#define isatty(x)       (x==0)  /* assume stdin is a tty */
+#endif
+
+
+static void manual_input (void)
 {
- lua_Object lo = lua_getparam(1);
- if (!lua_isnumber(lo))
-  lua_pushnil();
- else
- {
-  int n = (int)lua_getnumber(lo);
-  if (n < 1 || n > lua_argc) lua_pushnil();
-  else                       lua_pushstring(lua_argv[n]);
- }
+  if (isatty(0)) {
+    char buffer[250];
+    while (fgets(buffer, sizeof(buffer), stdin) != 0) {
+      lua_beginblock();
+      lua_dostring(buffer);
+      lua_endblock();
+    }
+  }
+  else
+    lua_dofile(NULL);  /* executes stdin as a file */
 }
 
 
 int main (int argc, char *argv[])
 {
- int i;
- int result = 0;
- iolib_open ();
- strlib_open ();
- mathlib_open ();
-
- lua_register("argv", lua_getargv);
-
- if (argc < 2)
- {
-   char buffer[250];
-   while (gets(buffer) != 0)
-     result = lua_dostring(buffer);
- }
- else
- {
-  for (i=1; i<argc; i++)
-  {
-   if (strcmp(argv[i], "--") == 0)
-   {
-    lua_argc = argc-i-1;
-    lua_argv = argv+i;
-    break;
-   }
+  int i;
+  int result = 0;
+  iolib_open ();
+  strlib_open ();
+  mathlib_open ();
+  if (argc < 2)
+    manual_input();
+  else for (i=1; i<argc; i++) {
+    if (strcmp(argv[i], "-") == 0)
+      manual_input();
+    else if (strcmp(argv[i], "-v") == 0)
+      printf("%s  %s\n(written by %s)\n\n",
+             LUA_VERSION, LUA_COPYRIGHT, LUA_AUTHORS);
+    else if ((strcmp(argv[i], "-e") == 0 && i++) || strchr(argv[i], '=')) {
+      if (lua_dostring(argv[i]) != 0) {
+        fprintf(stderr, "lua: error running argument `%s'\n", argv[i]);
+        return 1;
+      }
+    }
+    else {
+      result = lua_dofile (argv[i]);
+      if (result) {
+        if (result == 2) {
+          fprintf(stderr, "lua: cannot execute file `%s' - ", argv[i]);
+          perror(NULL);
+        }
+        return 1;
+      }
+    }
   }
-  for (i=1; i<argc; i++)
-  {
-   if (strcmp(argv[i], "--") == 0)
-    break;
-   else
-    result = lua_dofile (argv[i]);
-  }
- }
- return result;
+  return result;
 }
-
 
