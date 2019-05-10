@@ -1,4 +1,4 @@
-# $Id: makefile,v 1.27 1996/08/28 20:45:48 roberto Exp roberto $
+# $Id: makefile,v 1.35 1997/06/16 16:50:22 roberto Exp roberto $
 
 #configuration
 
@@ -6,10 +6,13 @@
 # define (undefine) _POSIX_SOURCE if your system is (not) POSIX compliant
 #define (undefine) NOSTRERROR if your system does NOT have function "strerror"
 # (although this is ANSI, SunOS does not comply; so, add "-DNOSTRERROR" on SunOS)
+# define LUA_COMPAT2_5=0 if yous system does not need to be compatible with
+# version 2.5 (or older)
 CONFIG = -DPOPEN -D_POSIX_SOURCE
 # Compilation parameters
 CC = gcc
-CFLAGS = $(CONFIG) -Wall -Wmissing-prototypes -Wshadow -ansi -O2 -pedantic
+CWARNS = -Wall -Wmissing-prototypes -Wshadow -pedantic -Wpointer-arith -Wcast-align -Waggregate-return
+CFLAGS = $(CONFIG) $(CWARNS) -ansi -O2 -fomit-frame-pointer
 
 #CC = acc
 #CFLAGS = -fast -I/usr/5include
@@ -28,9 +31,11 @@ LUAOBJS = \
 	inout.o \
 	tree.o \
 	fallback.o \
-	mem.o \
+	luamem.o \
 	func.o \
-	undump.o
+	undump.o \
+	auxlib.o \
+	zio.o
 
 LIBOBJS = 	\
 	iolib.o \
@@ -75,24 +80,32 @@ clear	:
 	co $@
 
 
-fallback.o : fallback.c mem.h fallback.h lua.h opcode.h types.h tree.h func.h \
-  table.h 
-func.o : func.c luadebug.h lua.h table.h tree.h types.h opcode.h func.h mem.h 
-hash.o : hash.c mem.h opcode.h lua.h types.h tree.h func.h hash.h table.h 
-inout.o : inout.c lex.h opcode.h lua.h types.h tree.h func.h inout.h table.h \
-  mem.h 
-iolib.o : iolib.c lua.h luadebug.h lualib.h 
-lex.o : lex.c mem.h tree.h types.h table.h opcode.h lua.h func.h lex.h inout.h \
-  luadebug.h parser.h 
-lua.o : lua.c lua.h lualib.h 
-mathlib.o : mathlib.c lualib.h lua.h 
-mem.o : mem.c mem.h lua.h
-opcode.o : opcode.c luadebug.h lua.h mem.h opcode.h types.h tree.h func.h hash.h \
-  inout.h table.h fallback.h undump.h 
-parser.o : parser.c luadebug.h lua.h mem.h lex.h opcode.h types.h tree.h func.h \
-  hash.h inout.h table.h 
-strlib.o : strlib.c lua.h lualib.h 
-table.o : table.c mem.h opcode.h lua.h types.h tree.h func.h hash.h table.h \
-  inout.h fallback.h luadebug.h 
-tree.o : tree.c mem.h lua.h tree.h types.h lex.h hash.h opcode.h func.h table.h 
-undump.o : undump.c opcode.h lua.h types.h tree.h func.h mem.h table.h undump.h 
+auxlib.o: auxlib.c lua.h auxlib.h luadebug.h
+fallback.o: fallback.c auxlib.h lua.h luamem.h fallback.h opcode.h \
+ types.h tree.h func.h table.h hash.h
+func.o: func.c luadebug.h lua.h table.h tree.h types.h opcode.h func.h \
+ luamem.h
+hash.o: hash.c luamem.h opcode.h lua.h types.h tree.h func.h hash.h \
+ table.h auxlib.h
+inout.o: inout.c auxlib.h lua.h fallback.h opcode.h types.h tree.h \
+ func.h hash.h inout.h lex.h zio.h luamem.h table.h undump.h
+iolib.o: iolib.c lua.h auxlib.h luadebug.h lualib.h
+lex.o: lex.c auxlib.h lua.h luamem.h tree.h types.h table.h opcode.h \
+ func.h lex.h zio.h inout.h luadebug.h parser.h
+lua.o: lua.c lua.h auxlib.h lualib.h
+luamem.o: luamem.c luamem.h lua.h
+mathlib.o: mathlib.c lualib.h lua.h auxlib.h
+opcode.o: opcode.c luadebug.h lua.h luamem.h opcode.h types.h tree.h \
+ func.h hash.h inout.h table.h fallback.h auxlib.h lex.h zio.h
+parser.o: parser.c luadebug.h lua.h luamem.h lex.h zio.h opcode.h \
+ types.h tree.h func.h hash.h inout.h table.h
+strlib.o: strlib.c lua.h auxlib.h lualib.h
+table.o: table.c luamem.h auxlib.h lua.h func.h types.h tree.h \
+ opcode.h hash.h table.h inout.h fallback.h luadebug.h
+tree.o: tree.c luamem.h lua.h tree.h types.h lex.h zio.h hash.h \
+ opcode.h func.h table.h fallback.h
+undump.o: undump.c auxlib.h lua.h opcode.h types.h tree.h func.h \
+ luamem.h table.h undump.h zio.h
+y.tab.o: y.tab.c luadebug.h lua.h luamem.h lex.h zio.h opcode.h \
+ types.h tree.h func.h hash.h inout.h table.h
+zio.o: zio.c zio.h
