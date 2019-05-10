@@ -1,39 +1,31 @@
 /*
-** table.c
 ** Module to control static tables
 ** TeCGraf - PUC-Rio
-** 11 May 93
+** $Id: table.h,v 2.9 1994/11/23 14:31:11 roberto Stab roberto $
 */
 
 #ifndef table_h
 #define table_h
 
+#include "tree.h"
+#include "opcode.h"
+
 extern Symbol *lua_table;
-extern Word    lua_ntable;
-
-extern char  **lua_constant;
-extern Word    lua_nconstant;
-
-extern char  **lua_string;
-extern Word    lua_nstring;
-
-extern Hash  **lua_array;
-extern Word    lua_narray;
+extern TaggedString **lua_constant;
 
 extern char   *lua_file[];
 extern int     lua_nfile;
 
-#define lua_markstring(s)	(*((s)-1))
 
-
-int   lua_findsymbol           (char *s);
-int   lua_findenclosedconstant (char *s);
-int   lua_findconstant         (char *s);
-void  lua_markobject           (Object *o);
-char *lua_createstring         (char *s);
-void *lua_createarray          (void *a);
-int   lua_addfile              (char *fn);
-char *lua_filename             (void);
-void  lua_nextvar              (void);
+void  lua_initconstant (void);
+Word  luaI_findsymbolbyname (char *name);
+Word  luaI_findsymbol      (TreeNode *t);
+Word  luaI_findconstant    (TreeNode *t);
+void  lua_travsymbol      (void (*fn)(Object *));
+void  lua_markobject      (Object *o);
+void  lua_pack            (void);
+char *lua_addfile         (char *fn);
+int   lua_delfile 	  (void);
+char *lua_filename        (void);
 
 #endif
