@@ -16,7 +16,7 @@ char *rcs_iolib="$Id: iolib.c,v 1.20 1995/02/02 18:54:58 roberto Exp roberto $";
 #include "lua.h"
 #include "lualib.h"
 
-static FILE *in=stdin, *out=stdout;
+static FILE *in=NULL, *out=NULL;
 
 /*
 ** Open a file to read.

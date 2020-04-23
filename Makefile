@@ -1,7 +1,7 @@
 # $Id: makefile,v 1.12 1995/02/02 19:02:03 roberto Exp $
 # Compilation parameters
 CC = gcc
-CFLAGS = -I/usr/5include -Wall -Wmissing-prototypes -Wshadow -ansi -O2
+CFLAGS = -I/usr/5include -Wall -Wmissing-prototypes -Wshadow -ansi -O0 -ggdb -std=gnu11
 
 #CC = acc
 #CFLAGS = -fast -I/usr/5include

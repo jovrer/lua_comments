@@ -1,1 +1,20 @@
 ﻿README
+
+
+FAQ
+
+Q1, /bin/sh: yacc++: 未找到命令
+A1, ln -s /usr/bin/yacc /usr/bin/yacc++
+
+Q2, make: *** 没有规则可以创建“parser.o”需要的目标“mem.h”。 停止。
+A2, ln -s ./luamem.h ./mem.h
+
+Q3, make: *** 没有规则可以创建“mem.o”需要的目标“mem.c”。 停止。
+A3, ln -s ./luamem.c ./mem.c
+
+Q4, iolib.c:19:1: 错误：初始值设定元素不是常量 static FILE *in=stdin, *out=stdout
+A4, static FILE *in=NULL, *out=NULL
+
+Q5, enable debug
+A5,Makefile:4 
+  CFLAGS = -I/usr/5include -Wall -Wmissing-prototypes -Wshadow -ansi -O0 -ggdb -std=gnu11
