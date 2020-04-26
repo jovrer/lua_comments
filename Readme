@@ -1,5 +1,3 @@
-﻿README
-
 
 FAQ
 
@@ -16,5 +14,5 @@ Q4, iolib.c:19:1: 错误：初始值设定元素不是常量 static FILE *in=std
 A4, static FILE *in=NULL, *out=NULL
 
 Q5, enable debug
-A5,Makefile:4 
+A5,Makefile:4
   CFLAGS = -I/usr/5include -Wall -Wmissing-prototypes -Wshadow -ansi -O0 -ggdb -std=gnu11
