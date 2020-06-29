@@ -50,7 +50,7 @@ MYLIBS= -ldl -lreadline -lhistory -lncurses
 
 
 CC= gcc
-CFLAGS= -Wall -O2 $(MYCFLAGS)
+CFLAGS= -Wall -O0 -ggdb3 $(MYCFLAGS)
 # CC= ~lhf/sunstudio12/bin/cc
 # CFLAGS= -xO5 -v -Xc -native -xstrconst
 AR= ar rcu
